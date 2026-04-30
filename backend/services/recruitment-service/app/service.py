@@ -1,32 +1,36 @@
 from __future__ import annotations
 
+import io
 from collections.abc import Iterable
 from uuid import UUID
 
+import cloudinary
+import cloudinary.uploader
+import fitz
 from fastapi import HTTPException, UploadFile, status
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
-import io
-import cloudinary
-import cloudinary.uploader
-import fitz
 
-from app.models import Application, CV, Job
+from app.core.config import settings
+from app.models import CV, Application, Job
 from app.schemas import (
     ApplicationCreate,
-    ApplicationStatusUpdate,
     ApplicationResponse,
-    CVResponse,
+    ApplicationStatusUpdate,
     CurrentUserContext,
+    CVResponse,
     JobCreate,
     JobResponse,
     JobUpdate,
 )
-from app.core.config import settings
 
 # configure cloudinary from env
-if settings.CLOUDINARY_CLOUD_NAME and settings.CLOUDINARY_API_KEY and settings.CLOUDINARY_API_SECRET:
+if (
+    settings.CLOUDINARY_CLOUD_NAME
+    and settings.CLOUDINARY_API_KEY
+    and settings.CLOUDINARY_API_SECRET
+):
     cloudinary.config(
         cloud_name=settings.CLOUDINARY_CLOUD_NAME,
         api_key=settings.CLOUDINARY_API_KEY,
@@ -53,7 +57,7 @@ def _attach_application_counts(db: Session, jobs: Iterable[Job]) -> list[JobResp
 
     responses: list[JobResponse] = []
     for job in job_list:
-        setattr(job, "applications_count", int(counts.get(job.id, 0)))
+        job.applications_count = int(counts.get(job.id, 0))
         responses.append(JobResponse.model_validate(job))
     return responses
 
@@ -84,7 +88,9 @@ def list_jobs(
 def get_job(db: Session, job_id: UUID) -> JobResponse:
     job = db.query(Job).filter(Job.id == job_id).first()
     if not job:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Job not found"
+        )
     return _attach_application_counts(db, [job])[0]
 
 
@@ -99,7 +105,9 @@ def get_my_jobs(db: Session, current_user: CurrentUserContext) -> list[JobRespon
     return _attach_application_counts(db, jobs)
 
 
-def create_job(db: Session, current_user: CurrentUserContext, payload: JobCreate) -> JobResponse:
+def create_job(
+    db: Session, current_user: CurrentUserContext, payload: JobCreate
+) -> JobResponse:
     require_role(current_user, {"recruiter"})
 
     job = Job(
@@ -123,9 +131,13 @@ def update_job(
 
     job = db.query(Job).filter(Job.id == job_id).first()
     if not job:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Job not found"
+        )
     if job.recruiter_id != current_user.user_id:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not your job")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Not your job"
+        )
 
     for field, value in payload.model_dump(exclude_unset=True).items():
         setattr(job, field, value)
@@ -140,19 +152,18 @@ def create_cv(
     current_user: CurrentUserContext,
     title: str,
     file: UploadFile,
-    ) -> CVResponse:
+) -> CVResponse:
     require_role(current_user, {"candidate"})
     # read bytes
     file_bytes = file.file.read()
 
     # try to extract basic info using PyMuPDF (fitz) when possible
     extracted_title = None
-    page_count = None
     try:
-        with fitz.open(stream=file_bytes, filetype=None) as doc:
+        with fitz.open(stream=file_bytes, filetype="pdf") as doc:
             meta = doc.metadata or {}
             extracted_title = meta.get("title")
-            page_count = doc.page_count
+            _page_count = doc.page_count
             # optionally, pull some text from first page (not stored currently)
     except Exception:
         # non-PDF or extraction failed; ignore and continue
@@ -162,7 +173,11 @@ def create_cv(
     file_url = None
     public_id = None
     try:
-        if settings.CLOUDINARY_CLOUD_NAME and settings.CLOUDINARY_API_KEY and settings.CLOUDINARY_API_SECRET:
+        if (
+            settings.CLOUDINARY_CLOUD_NAME
+            and settings.CLOUDINARY_API_KEY
+            and settings.CLOUDINARY_API_SECRET
+        ):
             # upload as raw so PDFs and docs are preserved
             res = cloudinary.uploader.upload(
                 io.BytesIO(file_bytes),
@@ -172,7 +187,10 @@ def create_cv(
             file_url = res.get("secure_url") or res.get("url")
             public_id = res.get("public_id")
     except Exception as err:
-        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=f"Failed to upload CV: {err}")
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=f"Failed to upload CV: {err}",
+        ) from err
 
     cv = CV(
         user_id=current_user.user_id,
@@ -206,7 +224,9 @@ def delete_cv(db: Session, current_user: CurrentUserContext, cv_id: UUID) -> Non
     require_role(current_user, {"candidate"})
     cv = db.query(CV).filter(CV.id == cv_id).first()
     if not cv:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="CV not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="CV not found"
+        )
     if cv.user_id != current_user.user_id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not your CV")
 
@@ -223,11 +243,15 @@ def apply_to_job(
 
     job = db.query(Job).filter(Job.id == payload.job_id).first()
     if not job:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Job not found"
+        )
 
     cv = db.query(CV).filter(CV.id == payload.cv_id).first()
     if not cv:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="CV not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="CV not found"
+        )
     if cv.user_id != current_user.user_id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not your CV")
 
@@ -253,7 +277,9 @@ def apply_to_job(
     return ApplicationResponse.model_validate(application)
 
 
-def get_my_applications(db: Session, current_user: CurrentUserContext) -> list[ApplicationResponse]:
+def get_my_applications(
+    db: Session, current_user: CurrentUserContext
+) -> list[ApplicationResponse]:
     require_role(current_user, {"candidate"})
     applications = (
         db.query(Application)
@@ -261,7 +287,9 @@ def get_my_applications(db: Session, current_user: CurrentUserContext) -> list[A
         .order_by(Application.applied_at.desc())
         .all()
     )
-    return [ApplicationResponse.model_validate(application) for application in applications]
+    return [
+        ApplicationResponse.model_validate(application) for application in applications
+    ]
 
 
 def get_job_applications(
@@ -273,9 +301,13 @@ def get_job_applications(
 
     job = db.query(Job).filter(Job.id == job_id).first()
     if not job:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Job not found"
+        )
     if job.recruiter_id != current_user.user_id:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not your job")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Not your job"
+        )
 
     applications = (
         db.query(Application)
@@ -283,7 +315,9 @@ def get_job_applications(
         .order_by(Application.applied_at.desc())
         .all()
     )
-    return [ApplicationResponse.model_validate(application) for application in applications]
+    return [
+        ApplicationResponse.model_validate(application) for application in applications
+    ]
 
 
 def update_application_status(
@@ -303,9 +337,13 @@ def update_application_status(
 
     job = db.query(Job).filter(Job.id == application.job_id).first()
     if not job:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Job not found"
+        )
     if job.recruiter_id != current_user.user_id:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not your job")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Not your job"
+        )
 
     application.status = payload.status
     db.commit()

@@ -3,7 +3,15 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String, Text, UniqueConstraint, func
+from sqlalchemy import (
+    DateTime,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+    func,
+)
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -74,7 +82,9 @@ class Job(Base):
 class Application(Base):
     __tablename__ = "applications"
     __table_args__ = (
-        UniqueConstraint("candidate_id", "job_id", name="uq_applications_candidate_job"),
+        UniqueConstraint(
+            "candidate_id", "job_id", name="uq_applications_candidate_job"
+        ),
         {"schema": "recruitment_service"},
     )
 

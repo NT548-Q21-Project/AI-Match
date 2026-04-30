@@ -9,8 +9,8 @@ from app.schemas import (
     ApplicationCreate,
     ApplicationResponse,
     ApplicationStatusUpdate,
-    CVResponse,
     CurrentUserContext,
+    CVResponse,
     JobCreate,
     JobResponse,
     JobUpdate,
@@ -31,7 +31,7 @@ from app.service import (
     update_job,
 )
 
-router = APIRouter(prefix = "/recruitment", tags=["Recruitment"])
+router = APIRouter(prefix="/recruitment", tags=["Recruitment"])
 
 
 @router.get("/jobs", response_model=list[JobResponse])
@@ -130,7 +130,9 @@ def read_job_applications(
     return get_job_applications(db, current_user, job_id)
 
 
-@router.patch("/applications/{application_id}/status", response_model=ApplicationResponse)
+@router.patch(
+    "/applications/{application_id}/status", response_model=ApplicationResponse
+)
 def change_application_status(
     application_id: UUID,
     payload: ApplicationStatusUpdate,
