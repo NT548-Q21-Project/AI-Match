@@ -5,11 +5,9 @@ class Settings(BaseSettings):
     APP_NAME: str = "AIMatch Identity Service"
     APP_ENV: str = "development"
 
-    DATABASE_URL: str = (
-        "postgresql+psycopg://postgres:postgres@localhost:5432/aimatch_db"
-    )
+    DATABASE_URL: str 
 
-    JWT_SECRET_KEY: str = "dev-secret-key"
+    JWT_SECRET_KEY: str
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440
 

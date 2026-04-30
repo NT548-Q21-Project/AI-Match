@@ -69,12 +69,16 @@ ON identity_service.users(role);
 -- Owns: CVs + jobs + applications
 -- ==================================================
 
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+CREATE SCHEMA IF NOT EXISTS recruitment_service;
+
 CREATE TABLE IF NOT EXISTS recruitment_service.cvs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL,
     file_name VARCHAR(255) NOT NULL,
+    title VARCHAR(255) NOT NULL,
     file_url TEXT,
-    s3_key TEXT,
     content_type VARCHAR(100),
     file_size INTEGER,
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
@@ -92,7 +96,7 @@ CREATE TABLE IF NOT EXISTS recruitment_service.jobs (
     location VARCHAR(255),
     job_type VARCHAR(50) NOT NULL DEFAULT 'full_time'
         CHECK (job_type IN ('full_time', 'part_time', 'internship')),
-    status VARCHAR(50) NOT NULL DEFAULT 'draft'
+    status VARCHAR(50) NOT NULL DEFAULT 'active'
         CHECK (status IN ('active', 'closed')),
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     expired_at TIMESTAMP
@@ -108,7 +112,7 @@ CREATE TABLE IF NOT EXISTS recruitment_service.applications (
         REFERENCES recruitment_service.cvs(id)
         ON DELETE CASCADE,
     status VARCHAR(50) NOT NULL DEFAULT 'submitted'
-        CHECK (status IN ('submitted', 'interview', 'rejected')),
+        CHECK (status IN ('submitted', 'interviewing', 'rejected', 'accepted')),
     applied_at TIMESTAMP NOT NULL DEFAULT NOW(),
     UNIQUE(candidate_id, job_id)
 );
@@ -160,7 +164,8 @@ CREATE TABLE IF NOT EXISTS ai_service.match_results (
     candidate_id UUID NOT NULL,
     cv_id UUID NOT NULL,
     job_id UUID NOT NULL,
-    score VARCHAR(30) NOT NULL
+    score VARCHAR(30) NOT NULL,
+    fit_level VARCHAR(30) NOT NULL
         CHECK (fit_level IN ('strong_fit', 'fit', 'weak_fit', 'not_fit')),
     strengths JSONB,
     weaknesses JSONB,
