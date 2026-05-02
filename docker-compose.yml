@@ -33,25 +33,47 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-
   identity-service:
     build:
       context: ./backend/services/identity-service
       dockerfile: Dockerfile
     image: aimatch-identity-service
     container_name: aimatch-identity-service
-    environment:
-      APP_NAME: AIMatch Identity Service
-      APP_ENV: development
-      DATABASE_URL: postgresql+psycopg://postgres:postgres@postgres:5432/aimatch_db
-      JWT_SECRET_KEY: dev-secret-key
-      JWT_ALGORITHM: HS256
-      ACCESS_TOKEN_EXPIRE_MINUTES: 1440
-    ports:
-      - "8001:8001"
+    env_file:
+      - ./backend/services/identity-service/.env
     depends_on:
       postgres:
         condition: service_healthy
+
+  recruitment-service:
+    build:
+      context: ./backend/services/recruitment-service
+      dockerfile: Dockerfile
+    image: aimatch-recruitment-service
+    container_name: aimatch-recruitment-service
+    env_file:
+      - ./backend/services/recruitment-service/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  api-gateway:
+    build:
+      context: ./backend/services/api-gateway
+      dockerfile: Dockerfile
+    image: aimatch-api-gateway
+    container_name: aimatch-api-gateway
+    env_file:
+      - ./backend/services/api-gateway/.env
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      identity-service:
+        condition: service_started
+      recruitment-service:
+        condition: service_started
 
 volumes:
   aimatch_postgres_data:
