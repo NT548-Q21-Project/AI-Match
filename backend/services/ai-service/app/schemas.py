@@ -27,6 +27,7 @@ class MatchAnalyzeRequest(BaseModel):
 
 class MatchAnalyzeResult(BaseModel):
     fit_level: FitLevel
+    score: int = Field(ge=0, le=100)
     strengths: list[str] = Field(default_factory=list)
     weaknesses: list[str] = Field(default_factory=list)
     suggestions: str | None = None
@@ -37,6 +38,7 @@ class MatchResultCreate(BaseModel):
     cv_id: UUID
     job_id: UUID
     fit_level: FitLevel
+    score: int = Field(ge=0, le=100)
     strengths: list[str] = Field(default_factory=list)
     weaknesses: list[str] = Field(default_factory=list)
     suggestions: str | None = None
@@ -50,6 +52,7 @@ class MatchResultResponse(BaseModel):
     cv_id: UUID
     job_id: UUID
     fit_level: FitLevel
+    score: int
     strengths: list[str] | None = None
     weaknesses: list[str] | None = None
     suggestions: str | None = None

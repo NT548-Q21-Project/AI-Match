@@ -5,6 +5,7 @@ from uuid import UUID
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.models import MatchResult
 from app.schemas import MatchAnalyzeRequest, MatchAnalyzeResult
 from app.services.llm_client import call_llm
@@ -17,6 +18,7 @@ Analyze the candidate CV against the job description.
 Return ONLY valid JSON using exactly this schema:
 {{
   "fit_level": "strong_fit | fit | weak_fit | not_fit",
+  "score": 0,
   "strengths": ["strength 1", "strength 2"],
   "weaknesses": ["weakness 1", "weakness 2"],
   "suggestions": "short practical suggestions for the candidate"
@@ -24,6 +26,7 @@ Return ONLY valid JSON using exactly this schema:
 
 Rules:
 - fit_level must be one of: strong_fit, fit, weak_fit, not_fit.
+- score must be an integer in range 0..100.
 - strong_fit: candidate clearly matches most important requirements.
 - fit: candidate matches the role but may have some gaps.
 - weak_fit: candidate has some relevant background but misses key requirements.
@@ -75,12 +78,43 @@ def _extract_json(text: str) -> dict:
         return json.loads(match.group(0))
 
 
+def _score_from_fit_level(fit_level: str) -> int:
+    return {
+        "strong_fit": 90,
+        "fit": 75,
+        "weak_fit": 50,
+        "not_fit": 25,
+    }.get(fit_level, 0)
+
+
+def _mock_match_result(payload: MatchAnalyzeRequest) -> MatchAnalyzeResult:
+    return MatchAnalyzeResult(
+        fit_level="fit",
+        score=78,
+        strengths=[
+            "Candidate CV has relevant keywords for the job title",
+            "Profile shows aligned technical background",
+        ],
+        weaknesses=[
+            "Some required responsibilities are not explicitly demonstrated",
+        ],
+        suggestions=(
+            "Highlight concrete achievements and metrics related to the job requirements."
+        ),
+    )
+
+
 async def analyze_match(payload: MatchAnalyzeRequest) -> MatchAnalyzeResult:
+    if settings.LLM_USE_MOCK:
+        return _mock_match_result(payload)
+
     prompt = _build_match_prompt(payload)
     raw_result = await call_llm(prompt)
 
     try:
         data = _extract_json(raw_result)
+        if "score" not in data:
+            data["score"] = _score_from_fit_level(data.get("fit_level", ""))
         return MatchAnalyzeResult(**data)
     except Exception as err:
         raise HTTPException(
@@ -109,6 +143,7 @@ async def analyze_and_save_match_result(
     if existing_match_result is not None:
         existing_match_result.candidate_id = candidate_id
         existing_match_result.fit_level = analyze_result.fit_level
+        existing_match_result.score = analyze_result.score
         existing_match_result.strengths = analyze_result.strengths
         existing_match_result.weaknesses = analyze_result.weaknesses
         existing_match_result.suggestions = analyze_result.suggestions
@@ -123,6 +158,7 @@ async def analyze_and_save_match_result(
         cv_id=payload.cv_id,
         job_id=payload.job_id,
         fit_level=analyze_result.fit_level,
+        score=analyze_result.score,
         strengths=analyze_result.strengths,
         weaknesses=analyze_result.weaknesses,
         suggestions=analyze_result.suggestions,

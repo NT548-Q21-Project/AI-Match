@@ -69,7 +69,7 @@ async def _proxy_request(
     if not path:
         target_url = upstream_base_url.rstrip("/")
 
-    async with httpx.AsyncClient(timeout=60.0) as client:
+    async with httpx.AsyncClient(timeout=500.0) as client:
         upstream_response = await client.request(
             request.method,
             target_url,

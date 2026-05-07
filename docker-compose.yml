@@ -74,6 +74,20 @@ services:
         condition: service_started
       recruitment-service:
         condition: service_started
+  
+  ai-service:
+    build:
+      context: ./backend/services/ai-service
+      dockerfile: Dockerfile
+    image: aimatch-ai-service
+    container_name: aimatch-ai-service
+    env_file:
+      - ./backend/services/ai-service/.env
+    ports:
+      - "8001:8001"
+    depends_on:
+      postgres:
+        condition: service_healthy
 
 volumes:
   aimatch_postgres_data:

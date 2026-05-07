@@ -47,6 +47,7 @@ def test_match_candidate_success_with_mocked_service(
             cv_id=payload.cv_id,
             job_id=payload.job_id,
             fit_level="strong_fit",
+            score=90,
             strengths=["Python", "FastAPI"],
             weaknesses=["AWS is unclear"],
             suggestions="Highlight cloud deployment experience.",
@@ -70,6 +71,7 @@ def test_match_candidate_success_with_mocked_service(
     data = response.json()
 
     assert data["fit_level"] == "strong_fit"
+    assert data["score"] == 90
     assert data["candidate_id"] == auth_headers["X-User-Id"]
     assert data["cv_id"] == sample_match_payload["cv_id"]
     assert data["job_id"] == sample_match_payload["job_id"]
