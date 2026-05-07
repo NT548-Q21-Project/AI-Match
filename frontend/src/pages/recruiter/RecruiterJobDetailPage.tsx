@@ -23,7 +23,7 @@ const RecruiterJobDetailPage: React.FC = () => {
       try {
         const [jobData, appData] = await Promise.all([
           jobApi.getJob(jobId),
-          applicationApi.getJobApplications(jobId)
+          applicationApi.getJobApplications(jobId),
         ]);
         setJob(jobData);
         setApplications(appData);

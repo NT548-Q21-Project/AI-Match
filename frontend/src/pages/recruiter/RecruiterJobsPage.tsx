@@ -5,6 +5,22 @@ import { jobApi } from "../../services/jobApi";
 import { Job } from "../../types/job";
 import { formatDate, cn } from "../../utils";
 
+const formatJobType = (jobType?: string) => {
+  switch (jobType) {
+    case "full_time":
+    case "full-time":
+      return "Full-time";
+    case "part_time":
+      return "Part-time";
+    case "internship":
+      return "Internship";
+    case "contract":
+      return "Contract";
+    default:
+      return "Unknown";
+  }
+};
+
 const RecruiterJobsPage: React.FC = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -95,6 +111,7 @@ const RecruiterJobsPage: React.FC = () => {
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-bold text-gray-500 uppercase tracking-widest">
                     <div className="flex items-center gap-1.5"><MapPin size={14} /> {job.location}</div>
                     <div className="flex items-center gap-1.5"><Calendar size={14} /> Created {formatDate(job.created_at)}</div>
+                    <div className="flex items-center gap-1.5"><Briefcase size={14} /> {formatJobType(job.job_type)}</div>
                   </div>
                 </div>
               </div>
