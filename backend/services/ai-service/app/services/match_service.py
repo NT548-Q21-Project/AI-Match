@@ -99,7 +99,8 @@ def _mock_match_result(payload: MatchAnalyzeRequest) -> MatchAnalyzeResult:
             "Some required responsibilities are not explicitly demonstrated",
         ],
         suggestions=(
-            "Highlight concrete achievements and metrics related to the job requirements."
+            "Highlight concrete achievements and "
+            "metrics related to the job requirements."
         ),
     )
 
