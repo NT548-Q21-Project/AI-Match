@@ -74,7 +74,45 @@ services:
         condition: service_started
       recruitment-service:
         condition: service_started
+  
+  ai-service:
+    build:
+      context: ./backend/services/ai-service
+      dockerfile: Dockerfile
+    image: aimatch-ai-service
+    container_name: aimatch-ai-service
+    env_file:
+      - ./backend/services/ai-service/.env
+    ports:
+      - "8001:8001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: aimatch-frontend
+    container_name: aimatch-frontend
+    volumes:
+      - frontend_dist:/app/dist
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    image: aimatch-nginx
+    container_name: aimatch-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - frontend_dist:/var/www/html
+    depends_on:
+      frontend:
+        condition: service_started
 
 volumes:
   aimatch_postgres_data:
   postgres_test_data:
+  frontend_dist:

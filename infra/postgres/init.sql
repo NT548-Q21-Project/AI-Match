@@ -166,6 +166,8 @@ CREATE TABLE IF NOT EXISTS ai_service.match_results (
     job_id UUID NOT NULL,
     fit_level VARCHAR(30) NOT NULL
         CHECK (fit_level IN ('strong_fit', 'fit', 'weak_fit', 'not_fit')),
+    score INTEGER NOT NULL
+        CHECK (score >= 0 AND score <= 100),
     strengths JSONB,
     weaknesses JSONB,
     suggestions TEXT,

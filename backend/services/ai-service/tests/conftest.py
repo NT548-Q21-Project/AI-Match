@@ -17,6 +17,7 @@ os.environ.setdefault("LLM_BASE_URL", "https://example.com/v1")
 os.environ.setdefault("LLM_API_KEY", "test-key")
 os.environ.setdefault("LLM_MODEL", "test-model")
 os.environ.setdefault("LLM_TIMEOUT_SECONDS", "10")
+os.environ.setdefault("LLM_USE_MOCK", "false")
 
 from app.db.session import Base, get_db  # noqa: E402
 from app.main import app  # noqa: E402

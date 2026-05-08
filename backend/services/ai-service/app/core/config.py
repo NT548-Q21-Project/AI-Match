@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     LLM_API_KEY: str = ""
     LLM_MODEL: str = "openrouter/free"
     LLM_TIMEOUT_SECONDS: float = 120.0
-
+    LLM_USE_MOCK: bool = False
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

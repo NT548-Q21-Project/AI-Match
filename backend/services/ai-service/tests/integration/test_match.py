@@ -16,6 +16,7 @@ def test_match_endpoint_saves_result_to_database(
         return """
         {
           "fit_level": "strong_fit",
+          "score": 93,
           "strengths": ["Python", "FastAPI", "PostgreSQL"],
           "weaknesses": ["AWS experience is not clearly shown"],
           "suggestions": "Add more detail about cloud deployment experience."
@@ -35,6 +36,7 @@ def test_match_endpoint_saves_result_to_database(
     data = response.json()
 
     assert data["fit_level"] == "strong_fit"
+    assert data["score"] == 93
     assert data["candidate_id"] == auth_headers["X-User-Id"]
     assert data["strengths"] == ["Python", "FastAPI", "PostgreSQL"]
 
@@ -62,6 +64,7 @@ def test_match_endpoint_updates_existing_result(
             return """
             {
               "fit_level": "weak_fit",
+              "score": 55,
               "strengths": ["Python"],
               "weaknesses": ["Missing FastAPI and PostgreSQL details"],
               "suggestions": "Improve backend project details."
@@ -71,6 +74,7 @@ def test_match_endpoint_updates_existing_result(
         return """
         {
           "fit_level": "fit",
+          "score": 76,
           "strengths": ["Python", "FastAPI"],
           "weaknesses": ["AWS experience is still unclear"],
           "suggestions": "Add cloud deployment examples."
@@ -111,6 +115,7 @@ def test_list_my_match_results(
         return """
         {
           "fit_level": "fit",
+          "score": 74,
           "strengths": ["Python", "Docker"],
           "weaknesses": ["CI/CD details are limited"],
           "suggestions": "Add CI/CD project examples."

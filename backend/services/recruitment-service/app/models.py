@@ -104,7 +104,6 @@ class Application(Base):
         ForeignKey("recruitment_service.cvs.id", ondelete="CASCADE"),
         nullable=False,
     )
-    cover_letter: Mapped[str | None] = mapped_column(Text, nullable=True)
     status: Mapped[str] = mapped_column(
         String(50),
         nullable=False,

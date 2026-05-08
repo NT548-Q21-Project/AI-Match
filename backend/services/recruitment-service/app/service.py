@@ -257,7 +257,6 @@ def apply_to_job(
         candidate_id=current_user.user_id,
         job_id=payload.job_id,
         cv_id=payload.cv_id,
-        cover_letter=payload.cover_letter,
         status="submitted",
     )
 

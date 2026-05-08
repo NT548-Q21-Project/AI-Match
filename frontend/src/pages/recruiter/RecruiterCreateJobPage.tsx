@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft, MapPin, Calendar, Loader2, Save, Send, ShieldCheck, HelpCircle } from "lucide-react";
 import { jobApi } from "../../services/jobApi";
-import { JobStatus } from "../../types/job";
+import { JobStatus, JobType } from "../../types/job";
 import { cn } from "../../utils";
 
 const RecruiterCreateJobPage: React.FC = () => {
@@ -17,6 +17,7 @@ const RecruiterCreateJobPage: React.FC = () => {
     benefits: "",
     location: "Remote",
     expired_at: "",
+    job_type: "full_time" as JobType,
     status: "active" as JobStatus
   });
 
@@ -80,6 +81,18 @@ const RecruiterCreateJobPage: React.FC = () => {
                     placeholder="e.g. Remote, UK"
                   />
                 </div>
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Job Type</label>
+                <select
+                  value={formData.job_type}
+                  onChange={(e) => setFormData({ ...formData, job_type: e.target.value as JobType })}
+                  className="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none font-bold text-gray-900 transition-all"
+                >
+                  <option value="full_time">Full-time</option>
+                  <option value="part_time">Part-time</option>
+                  <option value="internship">Internship</option>
+                </select>
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Expiry Date</label>
@@ -170,13 +183,13 @@ const RecruiterCreateJobPage: React.FC = () => {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setFormData({ ...formData, status: "draft" })}
+                  onClick={() => setFormData({ ...formData, status: "closed" })}
                   className={cn(
                     "flex-1 p-3 rounded-2xl border-2 font-black text-xs uppercase tracking-widest transition-all",
-                    formData.status === "draft" ? "bg-gray-100 border-gray-900 text-gray-900" : "bg-white border-gray-100 text-gray-400 hover:bg-gray-50"
+                    formData.status === "closed" ? "bg-gray-100 border-gray-900 text-gray-900" : "bg-white border-gray-100 text-gray-400 hover:bg-gray-50"
                   )}
                 >
-                  Draft
+                  Closed
                 </button>
               </div>
             </div>

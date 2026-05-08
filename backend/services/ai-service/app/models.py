@@ -4,6 +4,7 @@ from datetime import datetime
 from sqlalchemy import (
     CheckConstraint,
     DateTime,
+    Integer,
     String,
     Text,
     UniqueConstraint,
@@ -53,6 +54,11 @@ class MatchResult(Base):
 
     fit_level: Mapped[str] = mapped_column(
         String(30),
+        nullable=False,
+    )
+
+    score: Mapped[int] = mapped_column(
+        Integer,
         nullable=False,
     )
 

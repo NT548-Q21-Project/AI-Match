@@ -8,6 +8,7 @@ def test_extract_json_from_plain_json():
     raw_text = """
     {
       "fit_level": "fit",
+      "score": 75,
       "strengths": ["Python", "FastAPI"],
       "weaknesses": ["AWS is unclear"],
       "suggestions": "Add more cloud deployment experience."
@@ -26,6 +27,7 @@ def test_extract_json_from_markdown_json_block():
     ```json
     {
       "fit_level": "strong_fit",
+      "score": 90,
       "strengths": ["Python"],
       "weaknesses": [],
       "suggestions": "Good fit."
@@ -45,6 +47,7 @@ def test_analyze_match_returns_valid_result(monkeypatch, sample_match_payload):
         return """
         {
           "fit_level": "strong_fit",
+          "score": 92,
           "strengths": ["Python", "FastAPI", "PostgreSQL"],
           "weaknesses": ["AWS experience is not clear"],
           "suggestions": "Highlight cloud deployment experience."
@@ -57,5 +60,6 @@ def test_analyze_match_returns_valid_result(monkeypatch, sample_match_payload):
     result = asyncio.run(match_service.analyze_match(payload))
 
     assert result.fit_level == "strong_fit"
+    assert result.score == 92
     assert "Python" in result.strengths
     assert "AWS experience is not clear" in result.weaknesses
