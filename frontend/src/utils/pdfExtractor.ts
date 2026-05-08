@@ -1,9 +1,7 @@
 import * as pdfjsLib from "pdfjs-dist";
+import workerSrc from "pdfjs-dist/build/pdf.worker.min.mjs?url";
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
-  "pdfjs-dist/build/pdf.worker.min.mjs",
-  import.meta.url
-).toString();
+pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
 
 export async function extractTextFromPDF(url: string) {
   // fetch raw file
