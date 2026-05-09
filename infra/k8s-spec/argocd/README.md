@@ -4,7 +4,7 @@ This directory contains ArgoCD Application manifests for managing AIMatch deploy
 
 ## Prerequisites
 
-1. Create secret for argoCD to access github private repository (You can clone argo-cd-secret-example.yaml file, change the secret value with your value, but remember, dont commit this file to git)
+1. Create secret for argoCD to access github private repository (You can clone argo-cd-secret-example.yaml file, change the secret value with your value and kubectl apply -f that file to the cluster, but remember, dont commit this file to git)
 
 2. ArgoCD installed in your cluster
    ```bash
