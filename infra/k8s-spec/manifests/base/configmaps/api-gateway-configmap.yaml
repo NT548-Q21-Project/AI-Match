@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-gateway-config
+data:
+  APP_NAME: AIMatch API Gateway
+  APP_ENV: production
+  JWT_ALGORITHM: HS256
+  IDENTITY_SERVICE_URL: http://identity-service:8001
+  RECRUITMENT_SERVICE_URL: http://recruitment-service:8002
+  AI_SERVICE_URL: http://ai-service:8003

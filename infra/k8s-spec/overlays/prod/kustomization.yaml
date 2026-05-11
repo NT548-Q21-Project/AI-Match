@@ -1,0 +1,77 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: aimatch
+
+resources:
+  - ../../manifests/base
+
+images:
+  - name: aimatch-identity-service
+    newName: <YOUR_ECR_REGISTRY>/aimatch-identity-service # Replace with real ECR registry
+    newTag: prod-v1 # Placeholder tag, replace with real tag in production
+  - name: aimatch-recruitment-service
+    newName: <YOUR_ECR_REGISTRY>/aimatch-recruitment-service # same
+    newTag: prod-v1 # same
+  - name: aimatch-ai-service
+    newName: <YOUR_ECR_REGISTRY>/aimatch-ai-service #same
+    newTag: prod-v1 # same
+  - name: aimatch-api-gateway
+    newName: <YOUR_ECR_REGISTRY>/aimatch-api-gateway # same
+    newTag: prod-v1 # same
+
+patches:
+  - |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: identity-service
+    spec:
+      template:
+        spec:
+          containers:
+          - name: identity-service
+            imagePullPolicy: Always
+  - |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: recruitment-service
+    spec:
+      template:
+        spec:
+          containers:
+          - name: recruitment-service
+            imagePullPolicy: Always
+  - |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: ai-service
+    spec:
+      template:
+        spec:
+          containers:
+          - name: ai-service
+            imagePullPolicy: Always
+  - |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: api-gateway
+    spec:
+      template:
+        spec:
+          containers:
+          - name: api-gateway
+            imagePullPolicy: Always
+
+replicas:
+  - name: identity-service
+    count: 2
+  - name: recruitment-service
+    count: 2
+  - name: ai-service
+    count: 2
+  - name: api-gateway
+    count: 2
