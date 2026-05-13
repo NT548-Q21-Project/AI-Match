@@ -88,3 +88,75 @@ output "rds_sg_id" {
   description = "ID of the RDS security group"
   value       = module.security_groups.rds_sg_id
 }
+
+# ECR Outputs
+output "ecr_repository_urls" {
+  description = "Map of service names to ECR repository URLs"
+  value       = module.ecr.repository_urls
+}
+
+# Secrets Outputs
+output "groq_api_key_arn" {
+  description = "ARN of the Groq API key secret"
+  value       = module.secrets.groq_api_key_arn
+}
+
+output "jwt_secret_arn" {
+  description = "ARN of the JWT secret"
+  value       = module.secrets.jwt_secret_arn
+}
+
+output "db_credentials_arn" {
+  description = "ARN of the database credentials secret"
+  value       = module.secrets.db_credentials_arn
+}
+
+# RDS Outputs
+output "db_endpoint" {
+  description = "Endpoint of the RDS instance"
+  value       = module.rds.db_endpoint
+}
+
+output "db_port" {
+  description = "Port of the RDS instance"
+  value       = module.rds.db_port
+}
+
+# IAM Roles (Pod Identity)
+output "lb_controller_role_arn" {
+  description = "IAM role ARN for AWS Load Balancer Controller"
+  value       = module.alb.lb_controller_role_arn
+}
+
+output "api_gateway_role_arn" {
+  description = "IAM role ARN for API Gateway service"
+  value       = module.irsa.api_gateway_role_arn
+}
+
+output "identity_service_role_arn" {
+  description = "IAM role ARN for Identity Service"
+  value       = module.irsa.identity_service_role_arn
+}
+
+output "recruitment_service_role_arn" {
+  description = "IAM role ARN for Recruitment Service"
+  value       = module.irsa.recruitment_service_role_arn
+}
+
+output "ai_service_role_arn" {
+  description = "IAM role ARN for AI Service"
+  value       = module.irsa.ai_service_role_arn
+}
+
+# Notes for K8s manifests deployment:
+# 1. Create ServiceAccount in namespace "services" for each service with the same name as the service:
+#    - api-gateway
+#    - identity-service
+#    - recruitment-service
+#    - ai-service
+# 2. Create a single Ingress for api-gateway with annotations:
+#    kubernetes.io/ingress.class: alb
+#    alb.ingress.kubernetes.io/scheme: internet-facing
+#    alb.ingress.kubernetes.io/target-type: ip
+# 3. Other services should use ClusterIP (internal only)
+# 4. The aws-load-balancer-controller is deployed automatically in kube-system namespace

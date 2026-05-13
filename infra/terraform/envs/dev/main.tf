@@ -6,6 +6,10 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 6.0"
     }
+    helm = {
+      source  = "hashicorp/helm"
+      version = "~> 3.1.0"
+    }
   }
 
   # Backend configuration (uncomment and fill in bucket name)
@@ -25,6 +29,24 @@ provider "aws" {
     tags = local.default_tags
   }
 }
+
+provider "helm" {
+  kubernetes = {
+    host                   = module.eks.cluster_endpoint
+    cluster_ca_certificate = base64decode(module.eks.cluster_ca_certificate)
+
+    exec = {
+      api_version = "client.authentication.k8s.io/v1beta1"
+      command     = "aws"
+      args = [
+        "eks", "get-token",
+        "--cluster-name", var.cluster_name,
+        "--region", var.region,
+      ]
+    }
+  }
+}
+
 
 # Local values for consistent tagging
 locals {
@@ -86,4 +108,68 @@ module "eks" {
   node_disk_size             = var.node_disk_size
 
   depends_on = [module.vpc]
+}
+
+# ECR Module - Container repositories for all services
+module "ecr" {
+  source = "../../modules/ecr"
+
+  environment = var.environment
+  tags        = local.module_tags
+}
+
+# Secrets Manager Module - Application secrets
+module "secrets" {
+  source = "../../modules/secrets"
+
+  environment = var.environment
+  cluster_name = var.cluster_name
+  tags        = local.module_tags
+}
+
+# RDS Module - PostgreSQL database
+module "rds" {
+  source = "../../modules/rds"
+
+  environment        = var.environment
+  cluster_name       = var.cluster_name
+  vpc_id             = module.vpc.vpc_id
+  private_subnet_ids = module.vpc.private_subnet_ids
+  rds_sg_id          = module.security_groups.rds_sg_id
+
+  # db_username = module.secrets.db_username
+  db_username = "appuser"
+  db_password = module.secrets.db_password
+
+  tags = local.module_tags
+
+  depends_on = [module.secrets]
+}
+
+# IAM Roles with Pod Identity for all services
+module "irsa" {
+  source = "../../modules/irsa"
+
+  cluster_name       = var.cluster_name
+  environment        = var.environment
+  groq_api_key_arn   = module.secrets.groq_api_key_arn
+  jwt_secret_arn     = module.secrets.jwt_secret_arn
+  db_credentials_arn = module.secrets.db_credentials_arn
+  tags               = local.module_tags
+
+  depends_on = [module.eks]
+}
+
+# AWS Load Balancer Controller
+module "alb" {
+  source = "../../modules/alb"
+
+  cluster_name           = var.cluster_name
+  cluster_endpoint       = module.eks.cluster_endpoint
+  cluster_ca_certificate = module.eks.cluster_ca_certificate
+  vpc_id                 = module.vpc.vpc_id
+  environment            = var.environment
+  tags                   = local.module_tags
+
+  depends_on = [module.irsa]
 }
