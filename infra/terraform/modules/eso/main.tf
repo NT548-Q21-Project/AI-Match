@@ -89,7 +89,7 @@ resource "helm_release" "eso" {
     },
     {
       name  = "serviceAccount.name"
-      value = "aws-load-balancer-controller"
+      value = "external-secrets"
     }
   ]
 
