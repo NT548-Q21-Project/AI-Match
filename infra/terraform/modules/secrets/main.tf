@@ -12,7 +12,7 @@ locals {
   rds_host = split(":", var.rds_endpoint)[0]
 
   # Database passwords (shared across all services)
-  db_password = random_password.db_password.result
+  db_password_encoded = urlencode(random_password.db_password.result)
 }
 
 # Random password for database
@@ -87,7 +87,7 @@ resource "aws_secretsmanager_secret" "identity_db" {
 resource "aws_secretsmanager_secret_version" "identity_db" {
   secret_id     = aws_secretsmanager_secret.identity_db.id
   secret_string = jsonencode({
-    DATABASE_URL = "postgresql+psycopg://appuser:${local.db_password}@${local.rds_host}:5432/identity_db"
+    DATABASE_URL = "postgresql+psycopg://appuser:${local.db_password_encoded}@${local.rds_host}:5432/identity_db"
   })
 }
 
@@ -108,7 +108,7 @@ resource "aws_secretsmanager_secret" "recruitment_db" {
 resource "aws_secretsmanager_secret_version" "recruitment_db" {
   secret_id     = aws_secretsmanager_secret.recruitment_db.id
   secret_string = jsonencode({
-    DATABASE_URL = "postgresql+psycopg://appuser:${local.db_password}@${local.rds_host}:5432/recruitment_db"
+    DATABASE_URL = "postgresql+psycopg://appuser:${local.db_password_encoded}@${local.rds_host}:5432/recruitment_db"
   })
 }
 
@@ -129,6 +129,6 @@ resource "aws_secretsmanager_secret" "ai_db" {
 resource "aws_secretsmanager_secret_version" "ai_db" {
   secret_id     = aws_secretsmanager_secret.ai_db.id
   secret_string = jsonencode({
-    DATABASE_URL = "postgresql+psycopg://appuser:${local.db_password}@${local.rds_host}:5432/ai_db"
+    DATABASE_URL = "postgresql+psycopg://appuser:${local.db_password_encoded}@${local.rds_host}:5432/ai_db"
   })
 }
