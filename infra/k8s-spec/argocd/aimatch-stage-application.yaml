@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: aimatch-prod
+  name: aimatch-stage
   namespace: argocd
   
   finalizers:
@@ -11,7 +11,7 @@ spec:
 
   source:
     repoURL: https://github.com/NT548-Q21-Project/Course_Project
-    targetRevision: main
+    targetRevision: stage
     path: infra/k8s-spec/overlays/stage
 
   destination:
