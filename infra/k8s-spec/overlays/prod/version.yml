@@ -43,7 +43,7 @@ spec:
     spec:
       containers:
         - name: api-gateway
-          image: 832388983718.dkr.ecr.ap-southeast-1.amazonaws.com/api-gateway:latest
+          image: ""
           imagePullPolicy: Always
 ---
 apiVersion: apps/v1
