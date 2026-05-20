@@ -239,7 +239,7 @@ jobs:
     
     concurrency:
       group: update-kustomize-${{ github.event.pull_request.number || github.ref_name }}
-      cancel-in-progress: false
+      queue: max
 
     steps:
       - name: Checkout code
