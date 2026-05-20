@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: recruitment-service
-          image: 832388983718.dkr.ecr.ap-southeast-1.amazonaws.com/recruitment-service:latest
+          image: ""
           imagePullPolicy: Always
 ---
 apiVersion: apps/v1
