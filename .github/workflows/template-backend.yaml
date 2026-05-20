@@ -282,8 +282,11 @@ jobs:
             esac
           fi
 
-          VERSION_FILE="infra/k8s-spec/overlays/${ENV_DIR}/version.yml"
+          VERSION_FILE="infra/k8s-spec/overlays/${ENV_DIR}/version-${IMAGE_NAME}.yml"
           IMAGE_REF="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${IMAGE_NAME}:${IMAGE_TAG}"
+
+          export IMAGE_REF
+          echo "Image ref: ${IMAGE_REF}"
 
           yq e -i '
             (select(.kind == "Deployment" and .metadata.name == strenv(IMAGE_NAME))
