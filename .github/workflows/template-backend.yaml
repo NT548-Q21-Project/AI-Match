@@ -258,41 +258,44 @@ jobs:
           OVERLAY_ENV: ${{ inputs.overlay_env }}
         run: |
           set -euo pipefail
+
+          BRANCH_NAME="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
+          echo "Detected branch: ${BRANCH_NAME}"
+
           if [[ -n "${OVERLAY_ENV}" ]]; then
             ENV_DIR="${OVERLAY_ENV}"
           else
-            case "${GITHUB_REF_NAME}" in
-              main)
-                ENV_DIR="prod"
-                ;;
-              develop|stage)
-                ENV_DIR="stage"
-                ;;
-              *)
-                echo "Skip overlay update for branch ${GITHUB_REF_NAME}" >&2
-                exit 0
-                ;;
-            esac
-          fi
-
-          VERSION_FILE="infra/k8s-spec/overlays/${ENV_DIR}/version.yml"
-          IMAGE_REF="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${IMAGE_NAME}:${IMAGE_TAG}"
-
-          yq e -i '
-            (select(.kind == "Deployment" and .metadata.name == strenv(IMAGE_NAME))
-              .spec.template.spec.containers[] | select(.name == strenv(IMAGE_NAME)).image) = strenv(IMAGE_REF)
-          ' "${VERSION_FILE}"
-
-          if git diff --quiet "${VERSION_FILE}"; then
-            echo "No changes to commit"
+            case "${BRANCH_NAME}" in
+            main)
+            ENV_DIR="prod"
+            ;;
+          develop|stage)
+            ENV_DIR="stage"
+          ;;
+          *)
+            echo "Skip overlay update for branch ${BRANCH_NAME}" >&2
             exit 0
-          fi
+          ;;
+          esac
+        fi
 
-          TARGET_BRANCH="${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"  
+        VERSION_FILE="infra/k8s-spec/overlays/${ENV_DIR}/version.yml"
+        IMAGE_REF="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${IMAGE_NAME}:${IMAGE_TAG}"
 
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git config user.name "github-actions[bot]"
-          git add "${VERSION_FILE}"
-          git commit -m "chore(kustomize): update ${IMAGE_NAME} to ${IMAGE_TAG} [skip ci]"
-          git push origin HEAD:"${TARGET_BRANCH}"
-    
+        yq e -i '
+        (select(.kind == "Deployment" and .metadata.name == strenv(IMAGE_NAME))
+        .spec.template.spec.containers[] | select(.name == strenv(IMAGE_NAME)).image) = strenv(IMAGE_REF)
+        ' "${VERSION_FILE}"
+
+      if git diff --quiet "${VERSION_FILE}"; then
+        echo "No changes to commit"
+        exit 0
+      fi
+
+      TARGET_BRANCH="${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"
+
+      git config user.email "github-actions[bot]@users.noreply.github.com"
+      git config user.name "github-actions[bot]"
+      git add "${VERSION_FILE}"
+      git commit -m "chore(kustomize): update ${IMAGE_NAME} to ${IMAGE_TAG} [skip ci]"
+      git push origin HEAD:"${TARGET_BRANCH}"
