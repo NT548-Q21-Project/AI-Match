@@ -8,6 +8,7 @@ on:
     paths:
       - "backend/services/ai-service/**"
       - ".github/workflows/ai-service-ci.yml"
+      - ".github/workflows/template-backend.yaml"
 
   pull_request:
     branches:
@@ -16,6 +17,7 @@ on:
     paths:
       - "backend/services/ai-service/**"
       - ".github/workflows/ai-service-ci.yml"
+      - ".github/workflows/template-backend.yaml"
 
   workflow_dispatch:
 
@@ -29,7 +31,7 @@ jobs:
     with:
       service_path: backend/services/ai-service
       image_name: ai-service
-      image_tag: ${{ github.sha }}
+      image_tag: ${{ github.event.pull_request.head.sha || github.sha }}
       cache_dependency_glob: backend/services/ai-service/uv.lock
       aws_region: ap-southeast-1
       aws_account_id: "832388983718"

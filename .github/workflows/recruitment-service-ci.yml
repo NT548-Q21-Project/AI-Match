@@ -8,6 +8,7 @@ on:
     paths:
       - "backend/services/recruitment-service/**"
       - ".github/workflows/recruitment-service-ci.yml"
+      - ".github/workflows/template-backend.yaml"
 
   pull_request:
     branches:
@@ -16,6 +17,7 @@ on:
     paths:
       - "backend/services/recruitment-service/**"
       - ".github/workflows/recruitment-service-ci.yml"
+      - ".github/workflows/template-backend.yaml"
 
   workflow_dispatch:
 
@@ -29,7 +31,7 @@ jobs:
     with:
       service_path: backend/services/recruitment-service
       image_name: recruitment-service
-      image_tag: ${{ github.sha }}
+      image_tag: ${{ github.event.pull_request.head.sha || github.sha }}
       cache_dependency_glob: backend/services/recruitment-service/pyproject.toml
       aws_region: ap-southeast-1
       aws_account_id: "832388983718"
