@@ -34,7 +34,7 @@ def create_database_if_not_exists() -> None:
     db_name = settings.DATABASE_URL.split("/")[-1]
 
     # Connect vào postgres default db
-    postgres_url = settings.DATABASE_URL.rsplit("/", 1)[0] + "/postgres"
+    postgres_url = settings.DATABASE_URL.rsplit("/", 1)[0] + "/init_db"
     temp_engine = create_engine(postgres_url, isolation_level="AUTOCOMMIT")
 
     with temp_engine.connect() as conn:
