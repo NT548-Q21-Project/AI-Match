@@ -4,6 +4,8 @@ kind: Kustomization
 resources:
   - ../../manifests/base
 
+namespace: prod
+
 patches:
   - path: version-identity-service.yml
   - path: version-recruitment-service.yml
