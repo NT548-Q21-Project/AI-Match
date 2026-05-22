@@ -31,5 +31,3 @@ resources:
   - services/api-gateway.yaml
 
   - ingress.yaml
-
-namespace: services
