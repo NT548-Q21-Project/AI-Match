@@ -3,7 +3,7 @@ kind: Kustomization
 
 resources:
   - ../../manifests/base
-  - ../../manifests/base/external-secrets/secret-store.yaml
+  - secret-store.yaml
 
 namespace: prod
 
