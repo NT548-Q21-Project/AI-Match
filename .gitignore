@@ -87,3 +87,11 @@ override.tf.json
 # Test / Reports
 reports/
 coverage/
+test_terraform/
+
+
+# Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfstate.lock.info

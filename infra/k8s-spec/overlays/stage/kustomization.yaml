@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../manifests/base
+
+namespace: services
+
+patches:
+  - path: version-identity-service.yml
+  - path: version-recruitment-service.yml
+  - path: version-ai-service.yml
+  - path: version-api-gateway.yml
+  - path: version-frontend.yml
+  - path: replicas.yml

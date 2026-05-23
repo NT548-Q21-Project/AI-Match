@@ -1,0 +1,33 @@
+name: Frontend CI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "frontend/**"
+      - ".github/workflows/frontend-ci.yml"
+      - ".github/workflows/template-frontend.yaml"
+
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "frontend/**"
+      - ".github/workflows/frontend-ci.yml"
+      - ".github/workflows/template-frontend.yaml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  frontend-ci:
+    uses: ./.github/workflows/template-frontend.yaml
+    secrets: inherit
+    with:
+      service_path: frontend
+      image_name: frontend
+      image_tag: ${{ github.event.pull_request.head.sha || github.sha }}
+      aws_region: ap-southeast-1
+      aws_account_id: "832388983718"

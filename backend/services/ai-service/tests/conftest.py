@@ -90,7 +90,7 @@ def fake_db_dependency():
 @pytest.fixture
 def db_session() -> Generator[Session, None, None]:
     test_database_url = os.getenv(
-        "TEST_DATABASE_URL",
+        "DATABASE_URL",
         "postgresql+psycopg://postgres:postgres@localhost:5433/aimatch_test_db",
     )
 
@@ -99,7 +99,6 @@ def db_session() -> Generator[Session, None, None]:
     try:
         with engine.begin() as connection:
             connection.execute(text("CREATE EXTENSION IF NOT EXISTS pgcrypto"))
-            connection.execute(text("CREATE SCHEMA IF NOT EXISTS ai_service"))
     except OperationalError as err:
         pytest.skip(f"Test database is not available: {err}")
 

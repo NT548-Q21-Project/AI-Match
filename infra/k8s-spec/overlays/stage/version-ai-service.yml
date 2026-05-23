@@ -1,0 +1,11 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-service
+spec:
+  template:
+    spec:
+      containers:
+        - name: ai-service
+          image: 832388983718.dkr.ecr.ap-southeast-1.amazonaws.com/ai-service:46f4151a3368d84ed725df4b7ad4bee5b9d673e6
+          imagePullPolicy: Always
