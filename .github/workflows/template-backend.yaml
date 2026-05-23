@@ -247,6 +247,7 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.ref || github.ref }}
+          token: ${{ secrets.GH_PAT }}
 
       - name: Install yq
         run: |
