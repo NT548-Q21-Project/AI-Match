@@ -6,11 +6,7 @@ resources:
   - configmaps/recruitment-service-configmap.yaml
   - configmaps/ai-service-configmap.yaml
   - configmaps/api-gateway-configmap.yaml
-  # - secrets/identity-service/
-  # - secrets/recruitment-service/
-  # - secrets/ai-service/
-  # - secrets/api-gateway/
-  # - external-secrets/secret-store.yaml
+
   - external-secrets/identity-service-secret.yaml
   - external-secrets/recruitment-service-secret.yaml
   - external-secrets/ai-service-secret.yaml
