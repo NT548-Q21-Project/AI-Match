@@ -31,8 +31,6 @@ A modern full-stack recruitment platform that leverages AI to intelligently matc
 
 ![Architecture Diagram](./assets/architecture.png)
 
-```
-
 ### Microservices
 
 | Service | Port | Responsibility |
