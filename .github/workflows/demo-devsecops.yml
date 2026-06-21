@@ -1,7 +1,9 @@
 name: Demo DevSecOps Pipeline (No AWS Required)
 
 on:
-  workflow_dispatch: 
+  push:
+    branches:
+      - "feature/devsecops-loki"
 
 env:
   PYTHON_VERSION: "3.12"
