@@ -30,7 +30,7 @@ jobs:
       - name: Build Docker Image locally
         uses: docker/build-push-action@v6
         with:
-          context: ${{ env.SERVICE_PATH }}
+          context: .
           file: ${{ env.SERVICE_PATH }}/Dockerfile
           push: false 
           load: true 
