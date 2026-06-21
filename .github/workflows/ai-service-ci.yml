@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - stage
+      - feature/monitoring
     paths:
       - "backend/services/ai-service/**"
       - ".github/workflows/ai-service-ci.yml"
