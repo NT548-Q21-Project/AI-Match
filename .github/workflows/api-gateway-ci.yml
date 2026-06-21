@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - stage
+      - feature/monitoring
     paths:
       - "backend/services/api-gateway/**"
       - ".github/workflows/api-gateway-ci.yml"
