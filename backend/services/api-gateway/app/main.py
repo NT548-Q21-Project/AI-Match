@@ -3,6 +3,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from prometheus_fastapi_instrumentator import Instrumentator
+
 from app.core.config import settings
 from app.security import decode_access_token, get_bearer_token
 
