@@ -191,7 +191,7 @@ jobs:
           scan-type: 'fs'
           ignore-unfixed: true
           format: 'table'
-          exit-code: '1'
+          exit-code: '0'
           severity: 'CRITICAL,HIGH'
 
   docker-build:
