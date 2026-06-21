@@ -1,3 +1,4 @@
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -9,13 +10,14 @@ from app.db.session import Base, create_database_if_not_exists, engine
 from app.router import router
 
 
+app = FastAPI(title=settings.APP_NAME, version="0.1.0")
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     try:
         create_database_if_not_exists()
         Base.metadata.create_all(bind=engine)
     except Exception as e:
-        import logging
 
         logging.error(f"Startup error: {e}")
         raise
