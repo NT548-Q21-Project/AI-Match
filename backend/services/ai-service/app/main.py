@@ -1,5 +1,5 @@
-import logging
 from contextlib import asynccontextmanager
+import logging
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -18,7 +18,6 @@ async def lifespan(app: FastAPI):
         create_database_if_not_exists()
         Base.metadata.create_all(bind=engine)
     except Exception as e:
-
         logging.error(f"Startup error: {e}")
         raise
     yield
