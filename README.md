@@ -38,7 +38,7 @@ A modern full-stack recruitment platform that leverages AI to intelligently matc
 | **API Gateway** | 8000 | Authentication, request routing, reverse proxy |
 | **Identity Service** | 8001 | User registration, login, JWT management |
 | **Recruitment Service** | 8002 | Job CRUD, CV upload, application management |
-| **AI Service** | 8003 | CV-Job matching powered by self-hosted Qwen3-4B via vLLM |
+| **AI Service** | 8003 | CV-Job matching powered by self-hosted Qwen via vLLM |
 | **Frontend** | 3000 | React SPA (served via Nginx) |
 
 ---
@@ -78,7 +78,7 @@ A modern full-stack recruitment platform that leverages AI to intelligently matc
 - **PyMuPDF** — PDF text extraction for CV parsing
 - **Cloudinary** — CV file storage
 - **LLM Providers**:
-  - Self-hosted Qwen3-4B via vLLM
+  - Self-hosted Qwen via vLLM
   - OpenRouter-compatible cloud models
 
 ### Frontend
@@ -253,7 +253,7 @@ Course_Project/
    docker compose up --build
    ```
 
-   - Self-hosted Qwen3-4B
+   - Self-hosted Qwen
    ```bash
    docker compose --profile gpu up --build
    ```
