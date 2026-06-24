@@ -13,7 +13,6 @@ resources:
   - external-secrets/api-gateway-secret.yaml
 
   - deployments/frontend-deployment.yaml
-
   - deployments/identity-service-deployment.yaml
   - deployments/recruitment-service-deployment.yaml
   - deployments/ai-service-deployment.yaml
